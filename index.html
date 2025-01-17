@@ -1,66 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Craft Note Widget</title>
-  <style>
-    /* Basic styling so iframe fills the widget container */
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-    }
-    #iframeContainer {
-      width: 100%;
-      height: 100%;
-    }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>My Zoho Widget</title>
 </head>
 <body>
-  <div id="iframeContainer">
-    <!-- We'll dynamically set the src of this iframe -->
-    <iframe id="craftIframe" src="about:blank"></iframe>
-  </div>
-
-  <!-- Zoho EmbeddedApp script -->
-  <script src="https://crm.zohopublic.com/crm/javascript/zc/zoho.js"></script>
-  <script>
-    ZOHO.embeddedApp.on("PageLoad", function(data) {
-      // data should contain the record details
-      // For example, data.Entity === "Contacts", data.EntityId might be an array of record IDs
-
-      let recordIdArray = data && data.EntityId ? data.EntityId : [];
-      if (recordIdArray.length > 0) {
-        let recordId = recordIdArray[0];
-
-        // Now we fetch the record info from Zoho to get the Craft URL field
-        ZOHO.CRM.API.getRecordById({
-          Entity: "Contacts", // or "Leads", "Accounts", etc.
-          RecordID: recordId
-        }).then(function(response) {
-          if (response && response.data && response.data.length > 0) {
-            // "Craft_Note_URL" is the API name of your custom field in Zoho
-            let craftLink = response.data[0].Craft_Note_for_Record;;
-            if (craftLink) {
-              // Set the iframe src to the Craft link
-              document.getElementById("craftIframe").src = craftLink;
-            } else {
-              document.getElementById("craftIframe").src = "about:blank";
-            }
-          }
-        }).catch(function(err) {
-          console.error("Error fetching record:", err);
-        });
-      }
-    });
-
-    // Initialize the widget
-    ZOHO.embeddedApp.init();
-  </script>
+  <h1>Hello from GitHub Pages!</h1>
+  <!-- (Optional) Add an iframe, scripts, etc. here -->
 </body>
 </html>
