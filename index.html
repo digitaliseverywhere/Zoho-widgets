@@ -2,10 +2,87 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>My Zoho Widget</title>
+  <title>Zoho External Widget Example</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: sans-serif;
+    }
+    #info {
+      margin-bottom: 20px;
+    }
+    iframe {
+      width: 100%;
+      height: 500px;
+      border: 1px solid #ccc;
+    }
+  </style>
 </head>
 <body>
-  <h1>Hello from GitHub Pages!</h1>
-  <!-- (Optional) Add an iframe, scripts, etc. here -->
+  <h1>Hello from GitHub + Zoho SDK</h1>
+  <div id="info">Loading Craft note link from Zoho...</div>
+
+  <!-- We'll display or embed the Craft link here -->
+  <iframe id="craftIframe" src="" style="display:none;"></iframe>
+
+  <!-- 1) Include the Zoho JS SDK -->
+  <script src="https://crm.zohopublic.com/crm/javascript/zc/zoho.js"></script>
+
+  <script>
+    // 2) Listen for the PageLoad event:
+    ZOHO.embeddedApp.on("PageLoad", function(data) {
+      // 'data' contains context about the record or page in Zoho
+      console.log("PageLoad data:", data);
+
+      // Typically, data.Entity is the module name (e.g. "Contacts")
+      // and data.EntityId is an array of record IDs for the record(s) being viewed
+      const recordIdArray = data?.EntityId || [];
+
+      if (recordIdArray.length > 0) {
+        // Grab the first record ID (assuming single record view)
+        const recordId = recordIdArray[0];
+        // 3) Use the Zoho CRM API to get the record details
+        ZOHO.CRM.API.getRecordById({
+          Entity: "Contacts",     // <--- Or change to your module if needed
+          RecordID: recordId
+        })
+        .then((response) => {
+          console.log("Record response:", response);
+
+          if (response && response.data && response.data.length > 0) {
+            const recordData = response.data[0];
+
+            // 4) Extract your custom field (API name: Craft_Note_for_Record)
+            const craftUrl = recordData.Craft_Note_for_Record;
+            console.log("Craft URL from record:", craftUrl);
+
+            // 5) Display or embed the link if it exists
+            if (craftUrl) {
+              document.getElementById("info").textContent = "Craft Note URL: " + craftUrl;
+
+              // If you want to embed it in an iframe:
+              const iframe = document.getElementById("craftIframe");
+              iframe.src = craftUrl;
+              iframe.style.display = "block";
+            } else {
+              document.getElementById("info").textContent = "No Craft note URL found for this record.";
+            }
+          } else {
+            document.getElementById("info").textContent = "Could not fetch record details.";
+          }
+        })
+        .catch((err) => {
+          console.error("Error fetching record:", err);
+          document.getElementById("info").textContent = "Error fetching record details.";
+        });
+      } else {
+        document.getElementById("info").textContent = "No record ID found.";
+      }
+    });
+
+    // 6) Initialize the Zoho embeddedApp
+    ZOHO.embeddedApp.init();
+  </script>
 </body>
 </html>
